@@ -39,3 +39,15 @@ p_OfficeAndWeekday = nrow(subset(location9am, location == 'office' & daytype == 
 
 #Probability of stay at office if it is a weekday, this is A|B
 p_OfficeGivenWeekday = p_OfficeAndWeekday/p_Weekday
+
+
+#Now, using naivebayes package
+testLocation = data.frame(daytype = as.factor(c('weekday', 'weekend')))
+
+#Create the location prediction model
+loc_pred = naive_bayes(location ~ daytype, data = location9am)
+
+#Predict location with testLocation
+predict(loc_pred, testLocation)
+
+predict(loc_pred, testLocation, type = 'prob')
