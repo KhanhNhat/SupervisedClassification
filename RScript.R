@@ -47,7 +47,20 @@ testLocation = data.frame(daytype = as.factor(c('weekday', 'weekend')))
 #Create the location prediction model
 loc_pred = naive_bayes(location ~ daytype, data = location9am)
 
-#Predict location with testLocation
+#Predict location with testLocation, return the highest probability event
 predict(loc_pred, testLocation)
 
+#Show probability of all events
 predict(loc_pred, testLocation, type = 'prob')
+
+#Try naivebayes with more complex dataset
+locationHour = read.csv('locationHourType.csv', row.names = 1)
+
+locHour_pred = naive_bayes(location ~ daytype + hourtype, data = locationHour)
+
+testLocationHour = data.frame(daytype = as.factor(c('weekday', 'weekday', 'weekend')),
+                              hourtype = as.factor(c('morning', 'night', 'morning')))
+
+predict(locHour_pred, testLocationHour)
+
+predict(locHour_pred, testLocationHour, type = 'prob')
