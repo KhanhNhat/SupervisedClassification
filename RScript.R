@@ -88,3 +88,14 @@ donors$donation_pred = ifelse(donors$donation_prob > ave_prob, 1, 0)
 
 #Calculate the accuracy of model
 mean(donors$donated == donors$donation_pred)
+
+#Load pROC package for making ROC curve
+library(pROC)
+
+donation_ROC = roc(donors$donated, donors$donation_prob)
+
+plot(donation_ROC)
+
+auc(donation_ROC)
+
+
