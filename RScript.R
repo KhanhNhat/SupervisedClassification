@@ -64,3 +64,27 @@ testLocationHour = data.frame(daytype = as.factor(c('weekday', 'weekday', 'weeke
 predict(locHour_pred, testLocationHour)
 
 predict(locHour_pred, testLocationHour, type = 'prob')
+
+
+#Study Logistic Regression or also called Binary Classification
+
+#Load new dataset for this study
+donors = read.csv('donors.csv')
+
+table(donors$donated)
+
+#Create a simpe logistic model
+donation_model = glm(donated ~ bad_address + interest_religion + interest_veterans,
+                     data = donors, family = 'binomial')
+
+#Create a probability column of this dataset
+donors$donation_prob = predict(donation_model, type = 'response')
+
+#Calculate the mean of real donated
+ave_prob = mean(donors$donated)
+
+#Create a prediction column
+donors$donation_pred = ifelse(donors$donation_prob > ave_prob, 1, 0)
+
+#Calculate the accuracy of model
+mean(donors$donated == donors$donation_pred)
