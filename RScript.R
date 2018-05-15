@@ -98,4 +98,6 @@ plot(donation_ROC)
 
 auc(donation_ROC)
 
-
+#Do the same thing, using caTools package
+library(caTools)
+colAUC(donors[, c(3,7,8)], donors[, 1], plotROC = TRUE)
