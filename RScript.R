@@ -158,3 +158,11 @@ loan_TreeModel_post = prune(loan_TreeModel, cp = 0.00044)
 loan_test$pred_post = predict(loan_TreeModel_post, loan_test, type = 'class')
 mean(loan_test$pred_post == loan_test$outcome)
 
+#Now try Random Forest technique
+library(randomForest)
+
+loan_Model_ranForest = randomForest(outcome ~ ., data = loan_train)
+loan_test$pred_ranForest = predict(loan_Model_ranForest, loan_test, type = 'class')
+mean(loan_test$pred_ranForest == loan_test$outcome)
+
+
