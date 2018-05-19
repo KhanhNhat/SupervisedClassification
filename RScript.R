@@ -101,3 +101,25 @@ auc(donation_ROC)
 #Do the same thing, using caTools package
 library(caTools)
 colAUC(donors[, c(3,7,8)], donors[, 1], plotROC = TRUE)
+
+#Study how to make decision with Tree
+
+#Load rpart package
+library(rpart)
+library(rpart.plot)
+
+#Load dataset
+loans = read.csv('loans.csv')
+
+#Modify this dataset
+loans = loans %>% mutate(outcome = ifelse(default == 1, 'default', 'repaid'))
+loans$outcome = as.factor(loans$outcome)
+
+#Create a tree model with rpart::rpart function
+loan_TreeModel = rpart(outcome ~ credit_score + loan_amount,
+                       data = loans, method = 'class', 
+                       control = rpart.control(cp = 0))
+
+#Plot a tree with rpart.plot::rpart.plot function
+rpart.plot(loan_TreeModel, type = 3, box.palette = c('red', 'green'), fallen.leaves = TRUE)
+
