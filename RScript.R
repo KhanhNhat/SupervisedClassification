@@ -114,12 +114,47 @@ loans = read.csv('loans.csv')
 #Modify this dataset
 loans = loans %>% mutate(outcome = ifelse(default == 1, 'default', 'repaid'))
 loans$outcome = as.factor(loans$outcome)
+loans = loans[-c(1,2,3)]
 
-#Create a tree model with rpart::rpart function
-loan_TreeModel = rpart(outcome ~ credit_score + loan_amount,
-                       data = loans, method = 'class', 
+#Create a simple tree model with rpart::rpart function, dataset kyphosis
+ky_TreeModel = rpart(Kyphosis ~ Age + Number + Start,
+                       data = kyphosis, method = 'class', 
                        control = rpart.control(cp = 0))
 
 #Plot a tree with rpart.plot::rpart.plot function
-rpart.plot(loan_TreeModel, type = 3, box.palette = c('red', 'green'), fallen.leaves = TRUE)
+rpart.plot(ky_TreeModel, type = 3, box.palette = c('green', 'tomato'), fallen.leaves = TRUE)
+
+#Create training and test data from loans dataset
+loan_sample = sample(nrow(loans), nrow(loans) * 0.75)
+
+loan_train = loans[loan_sample,]
+loan_test = loans[-loan_sample,]
+
+#Create a complex Tree Classification model and calculate its accuracy
+#It is too complex to draw with rpart.plot
+loan_TreeModel = rpart(outcome ~ ., data = loan_train, method = 'class', control = rpart.control(cp = 0))
+loan_test$pred = predict(loan_TreeModel, loan_test, type = 'class')
+mean(loan_test$pred == loan_test$outcome)
+
+#Now, cut down the overgrown tree with pre-prune. It can improve model accuracy
+#Maximum go to 6 level only
+loan_TreeModel_Pre1 = rpart(outcome ~ ., data = loan_train, method = 'class', 
+                       control = rpart.control(maxdepth = 6))
+loan_test$pred_pre1 = predict(loan_TreeModel_Pre1, loan_test, type = 'class')
+mean(loan_test$pred_pre1 == loan_test$outcome)
+
+#Have about 500 observations
+loan_TreeModel_Pre2 = rpart(outcome ~ ., data = loan_train, method = 'class', 
+                            control = rpart.control(minsplit = 500))
+loan_test$pred_pre2 = predict(loan_TreeModel_Pre2, loan_test, type = 'class')
+mean(loan_test$pred_pre2 == loan_test$outcome)
+
+#Try to cut down the tree with post-prune
+#Plot out the cp value to choose appropriate value for cp
+plotcp(loan_TreeModel)
+
+#Prune the tree and calculate its accuracy
+loan_TreeModel_post = prune(loan_TreeModel, cp = 0.00044)
+loan_test$pred_post = predict(loan_TreeModel_post, loan_test, type = 'class')
+mean(loan_test$pred_post == loan_test$outcome)
 
